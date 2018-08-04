@@ -1,9 +1,14 @@
 range = [ -8, 8 ];
 paddingBottom = 100;
 isPaused = false;
+functionStr = "-Math.pow(x * 0.5, 2)";
 
 function onLoad() {
 	canvas = document.getElementById("canvas");
+	functionStringInput = document.getElementById("function-string");
+	bottomPaddingInput = document.getElementById("bottom-padding-string");
+	functionStringInput.value = functionStr;
+	bottomPaddingInput.value = paddingBottom;
 	//	canvas.width = window.innerWidth - 20;
 	context = canvas.getContext("2d");
 
@@ -84,6 +89,13 @@ function mouseMove(e) {
 	x = toFunctionX(x);
 	drawReflection(x, Math.PI / 2, null, true, true, true);
 }
+
+function applyClick(e) {
+	functionStr = functionStringInput.value;
+	paddingBottom = bottomPaddingInput.value;
+}
+
+
 
 function drawReflection(x, angle, color, isDrawPoint, isDrawIncidentRay, isDrawTangent) {
 	//	console.log("function x", x);
@@ -175,7 +187,7 @@ function drawReflection(x, angle, color, isDrawPoint, isDrawIncidentRay, isDrawT
 }
 
 function f(x) {
-	return -Math.pow(x * 0.5, 2);
+	return eval(functionStr);
 }
 
 //function fPrime(x) {

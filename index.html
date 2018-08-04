@@ -7,6 +7,19 @@
 <script src="main.js"></script>
 </head>
 <body onLoad="onLoad();">
+	<div id="control-panel">
+		<table>
+			<tr>
+				<td>function</td>
+				<td><input type="text" id="function-string" size="100%"/></td>
+			</tr>
+			<tr>
+				<td>bottom padding</td>
+				<td><input type="text" id="bottom-padding-string" size="10"/></td>
+			</tr>
+		</table>  
+		<button id="apply-button" onClick="applyClick(event);">Apply</button>
+	</div>
 	<canvas 
 		onMouseOver="mouseOver(event);" 
 		onMouseOut="mouseOut(event);" 
