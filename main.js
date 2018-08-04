@@ -1,7 +1,7 @@
 range = [ -8, 8 ];
 paddingBottom = 100;
 isPaused = false;
-functionStr = "-Math.pow(x * 0.5, 2)";
+functionStr = "Math.pow(x / 2, 2)";
 
 function onLoad() {
 	canvas = document.getElementById("canvas");
@@ -12,23 +12,7 @@ function onLoad() {
 	//	canvas.width = window.innerWidth - 20;
 	context = canvas.getContext("2d");
 
-	minY = Number.MAX_VALUE;
-	maxY = -Number.MAX_VALUE;
-	for (var x = range[0]; x <= range[1]; x += (range[1] - range[0]) / canvas.width) {
-		var y = f(x);
-		minY = Math.min(y, minY);
-		maxY = Math.max(y, maxY);
-	}
-
-	var rangeSize = range[1] - range[0];
-	var domainSize = maxY - minY;
-	if (rangeSize > domainSize) {
-		scale = rangeSize / canvas.width;
-	} else {
-		scale = domainSize / canvas.height;
-	}
-	//	console.log("scale", scale);
-
+	computeScale();
 	var angle = 0;
 	setInterval(function() {
 		if (!isPaused) {
@@ -91,7 +75,16 @@ function mouseMove(e) {
 }
 
 function applyClick(e) {
+	var x = 1;
+	try {
+		eval(functionStringInput.value)
+	} catch (e) {
+		alert("Invalid function.  Try harder.");
+		return;
+	}
+
 	functionStr = functionStringInput.value;
+	computeScale();
 	paddingBottom = bottomPaddingInput.value;
 }
 
@@ -187,7 +180,26 @@ function drawReflection(x, angle, color, isDrawPoint, isDrawIncidentRay, isDrawT
 }
 
 function f(x) {
-	return eval(functionStr);
+	return -eval(functionStr);
+}
+
+function computeScale() {
+	minY = Number.MAX_VALUE;
+	maxY = -Number.MAX_VALUE;
+	for (var x = range[0]; x <= range[1]; x += (range[1] - range[0]) / canvas.width) {
+		var y = f(x);
+		minY = Math.min(y, minY);
+		maxY = Math.max(y, maxY);
+	}
+
+	var rangeSize = range[1] - range[0];
+	var domainSize = maxY - minY;
+	if (rangeSize > domainSize) {
+		scale = rangeSize / canvas.width;
+	} else {
+		scale = domainSize / canvas.height;
+	}
+//	console.log("scale", scale);
 }
 
 //function fPrime(x) {
