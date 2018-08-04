@@ -1,9 +1,10 @@
 range = [ -8, 8 ];
 paddingBottom = 100;
+isPaused = false;
 
 function onLoad() {
 	canvas = document.getElementById("canvas");
-	canvas.width = window.innerWidth - 20;
+	//	canvas.width = window.innerWidth - 20;
 	context = canvas.getContext("2d");
 
 	minY = Number.MAX_VALUE;
@@ -25,13 +26,19 @@ function onLoad() {
 
 	var angle = 0;
 	setInterval(function() {
-		paint();
-		for (var x = range[0]; x <= range[1]; x += 2 * (range[1] - range[0]) / canvas.width) {
-			drawReflection(x, angle * Math.PI, false, true, false);
-			drawReflection(x, -angle * Math.PI, false, true, false);
+		if (!isPaused) {
+			paint();
+			var hue = 0;
+			for (var x = range[0]; x <= range[1]; x += 2 * (range[1] - range[0]) / canvas.width) {
+				hue += 0.002;
+				var color = hsvToRgb(hue, 0.8, 0.6);
+				color = "rgba(" + color.r + ", " + color.g + ", " + color.b + ", 0.3)";
+				drawReflection(x, angle * Math.PI, color, false, true, false);
+				drawReflection(x, -angle * Math.PI, color, false, true, false);
+			}
+			angle += 0.004;
+			angle %= 2 * Math.PI;
 		}
-		angle += 0.004;
-		angle %= 2 * Math.PI;
 	}, 20);
 }
 
@@ -59,6 +66,14 @@ function paint() {
 }
 
 
+function mouseOver(e) {
+	isPaused = true;
+}
+
+function mouseOut(e) {
+	isPaused = false;
+}
+
 function onClick(e) {
 }
 
@@ -67,10 +82,10 @@ function mouseMove(e) {
 	//	console.log("x", x);
 	paint();
 	x = toFunctionX(x);
-	drawReflection(x, Math.PI / 2, true, true, true);
+	drawReflection(x, Math.PI / 2, null, true, true, true);
 }
 
-function drawReflection(x, angle, isDrawPoint, isDrawIncidentRay, isDrawTangent) {
+function drawReflection(x, angle, color, isDrawPoint, isDrawIncidentRay, isDrawTangent) {
 	//	console.log("function x", x);
 	var point = {
 		x : x,
@@ -79,8 +94,8 @@ function drawReflection(x, angle, isDrawPoint, isDrawIncidentRay, isDrawTangent)
 	//	console.log("point ", point);
 
 	context.fillStyle = "#000";
-	context.strokeStyle = "rgba(255, 128, 0, 0.3)";
-	context.lineWidth = 2;
+	context.strokeStyle = color || "rgba(255, 128, 0, 0.3)";
+	context.lineWidth = 4;
 
 	if (isDrawPoint) {
 		context.beginPath();
@@ -176,4 +191,53 @@ function toCanvasPoint(p) {
 
 function toFunctionX(x) {
 	return range[0] + x * scale;
+}
+
+/* accepts parameters
+ * h  Object = {h:x, s:y, v:z}
+ * OR 
+ * h, s, v
+*/
+function hsvToRgb(h, s, v) {
+	var r,
+		g,
+		b,
+		i,
+		f,
+		p,
+		q,
+		t;
+	if (arguments.length === 1) {
+		s = h.s, v = h.v, h = h.h;
+	}
+	i = Math.floor(h * 6);
+	f = h * 6 - i;
+	p = v * (1 - s);
+	q = v * (1 - f * s);
+	t = v * (1 - (1 - f) * s);
+	switch (i % 6) {
+	case 0:
+		r = v, g = t, b = p;
+		break;
+	case 1:
+		r = q, g = v, b = p;
+		break;
+	case 2:
+		r = p, g = v, b = t;
+		break;
+	case 3:
+		r = p, g = q, b = v;
+		break;
+	case 4:
+		r = t, g = p, b = v;
+		break;
+	case 5:
+		r = v, g = p, b = q;
+		break;
+	}
+	return {
+		r : r * 255,
+		g : g * 255,
+		b : b * 255
+	};
 }
